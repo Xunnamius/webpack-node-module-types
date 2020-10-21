@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [![Black Lives Matter!](https://api.ergodark.com/badges/blm "Join the movement!")](https://secure.actblue.com/donate/ms_blm_homepage_2019)
 [![Maintenance status](https://img.shields.io/maintenance/active/2020 "Is this package maintained?")](https://www.npmjs.com/package/webpack-node-module-types)
 [![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/webpack-node-module-types/develop "When was the last commit to the official repo?")](https://www.npmjs.com/package/webpack-node-module-types)
@@ -6,6 +7,9 @@
 [![DavidDM dependencies](https://img.shields.io/david/xunnamius/webpack-node-module-types "Status of this package's dependencies")](https://david-dm.org/xunnamius/webpack-node-module-types)
 [![Source license](https://img.shields.io/npm/l/webpack-node-module-types "This package's source license")](https://www.npmjs.com/package/webpack-node-module-types)
 [![NPM version](https://api.ergodark.com/badges/npm-pkg-version/webpack-node-module-types "Install this package using npm or yarn!")](https://www.npmjs.com/package/webpack-node-module-types)
+=======
+# webpack-node-module-types
+>>>>>>> Update README.md
 
 # webpack-node-module-types
 
