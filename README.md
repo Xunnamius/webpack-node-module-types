@@ -14,7 +14,7 @@ CJS/`.cjs`/`.js`) of each top-level package in `node_modules/`. This plugin
 should come to the same determination about a module's type as Webpack would.
 
 Originally created to gather module metadata for
-[webpack-node-module-types](https://github.com/Xunnamius/webpack-node-module-types).
+[babel-plugin-transform-mjs-imports](https://github.com/Xunnamius/babel-plugin-transform-mjs-imports).
 
 ## Installation
 
