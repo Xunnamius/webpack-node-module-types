@@ -11,7 +11,8 @@
 
 This package attempts to determine the module type (ESM/`.mjs` vs
 CJS/`.cjs`/`.js`) of each top-level package in `node_modules/`. This plugin
-should come to the same determination about a module's type as Webpack would.
+should come to the same determination about a module's type as Webpack does in
+the vast majority of cases.
 
 Originally created to gather module metadata for
 [babel-plugin-transform-mjs-imports](https://github.com/Xunnamius/babel-plugin-transform-mjs-imports).
