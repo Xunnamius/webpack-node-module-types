@@ -9,9 +9,9 @@
 
 # webpack-node-module-types
 
-This package attempts to determine the module type (ESM/`.mjs` vs CJS/`.cjs`) of
-each package in `node_modules/`. This plugin should come to the same
-determination about a module's type as Webpack would.
+This package attempts to determine the module type (ESM/`.mjs` vs
+CJS/`.cjs`/`.js`) of each top-level package in `node_modules/`. This plugin
+should come to the same determination about a module's type as Webpack would.
 
 Originally created to gather module metadata for
 [webpack-node-module-types](https://github.com/Xunnamius/webpack-node-module-types).
