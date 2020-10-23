@@ -1,4 +1,4 @@
-import { readdir, stat, readFile } from 'fs/promises'
+import { readdirSync as readdir, statSync as stat, readFileSync as readFile } from 'fs'
 import { join as joinPath, basename } from 'path'
 
 let determined = false;
@@ -7,14 +7,14 @@ const esm: string[] = [];
 
 type Export = string | { [key: string]: Export };
 
-const isCjs = async (path: string) => {
+const isCjs = (path: string) => {
     try{
         const pkg: {
             type?: string,
             main?: string,
             exports: Export,
             module?: string,
-        } = JSON.parse((await readFile(joinPath(path, 'package.json'), { encoding: 'utf-8' })));
+        } = JSON.parse((readFile(joinPath(path, 'package.json'), { encoding: 'utf-8' })));
 
         // * https://nodejs.org/api/esm.html#esm_packages
         // We classify a package as ESM if its package.json has:
@@ -45,34 +45,32 @@ const isCjs = async (path: string) => {
     }
 };
 
-const determine = async (dir: string, scoped = false) => {
-    await Promise.all((await readdir(dir)).map(file => {
-        return (async () => {
-            const path = joinPath(dir, file);
+const determine = (dir: string, scoped = false) => {
+    readdir(dir).map(file => {
+        const path = joinPath(dir, file);
 
-            if((await stat(path)).isDirectory()) {
-                if(!file.startsWith('.')) {
-                    if(file.startsWith('@')) {
-                        if(scoped) throw new Error(`encountered illegally-scoped package at "${path}"`);
-                        await determine(path, true);
-                    }
+        if((stat(path)).isDirectory()) {
+            if(!file.startsWith('.')) {
+                if(file.startsWith('@')) {
+                    if(scoped) throw new Error(`encountered illegally-scoped package at "${path}"`);
+                    determine(path, true);
+                }
 
-                    else {
-                        (await isCjs(path) ? cjs : esm).push(scoped ? `${basename(dir)}/${file}` : file);
-                    }
+                else {
+                    (isCjs(path) ? cjs : esm).push(scoped ? `${basename(dir)}/${file}` : file);
                 }
             }
-        })();
-    }));
+        }
+    });
 };
 
 /**
  * Returns an object with keys `cjs` and `esm` each pointing to an array of
  * strings representing CJS and ES modules under node_modules, respectively.
  */
-export async function determineModuleTypes() {
+export function determineModuleTypes() {
     if(!determined) {
-        await determine(joinPath(process.cwd(), 'node_modules'));
+        determine(joinPath(process.cwd(), 'node_modules'));
         determined = true;
     }
 

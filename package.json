@@ -1,6 +1,6 @@
 {
   "name": "webpack-node-module-types",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Attempts to classify each dependency under node_modules as a CJS or ESM package",
   "keywords": [
     "node",
@@ -11,7 +11,7 @@
     "esm",
     "es",
     "cjs",
-    "cjs2 "
+    "cjs2"
   ],
   "repository": {
     "type": "git",
@@ -23,6 +23,8 @@
   "type": "commonjs",
   "exports": {
     ".": "./dist/index.js",
+    "./sync": "./dist/sync.js",
+    "./async": "./dist/index.js",
     "./package": "./package.json",
     "./package.json": "./package.json"
   },
@@ -44,7 +46,7 @@
     "postpublish": "npm run clean",
     "publishGuard": "npm run check-types && npm run test && npx npm-force-resolutions && npx Xunnamius/sort-package-json && npm audit",
     "repl": "command -v rlwrap >/dev/null && rlwrap npx -p @babel/core -p @babel/node babel-node",
-    "test": "BABEL_ENV=test jest --coverage"
+    "test": "BABEL_ENV=test jest --coverage --runInBand"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.1",

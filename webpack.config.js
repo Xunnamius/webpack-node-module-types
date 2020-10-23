@@ -9,10 +9,13 @@ module.exports = {
     target: 'node',
     node: false,
 
-    entry: `${__dirname}/src/index.ts`,
+    entry: {
+        'index': `${__dirname}/src/index.ts`,
+        'sync': `${__dirname}/src/sync.ts`,
+    },
 
     output: {
-        filename: 'index.js',
+        filename: '[name].js',
         path: `${__dirname}/dist`,
         libraryTarget: 'commonjs2',
     },

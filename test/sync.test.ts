@@ -1,4 +1,4 @@
-import { determineModuleTypes, clearCache } from '../src/index'
+import { determineModuleTypes, clearCache } from '../src/sync'
 import { join as joinPath } from 'path'
 
 process.chdir(__dirname);
@@ -9,11 +9,11 @@ beforeEach(() => {
     clearCache();
 })
 
-describe('[ASYNC API] webpack-node-module-types', () => {
-    it('differentiates CJS and ESM packages', async () => {
+describe('[SYNC API] webpack-node-module-types', () => {
+    it('differentiates CJS and ESM packages', () => {
         expect.hasAssertions();
 
-        const { cjs, esm } = await determineModuleTypes();
+        const { cjs, esm } = determineModuleTypes();
 
         expect(cjs).toIncludeAllMembers([
             'cjs-1',
@@ -30,10 +30,10 @@ describe('[ASYNC API] webpack-node-module-types', () => {
         ]);
     });
 
-    it('classifies CJS+ESM dual packages as ESM', async () => {
+    it('classifies CJS+ESM dual packages as ESM', () => {
         expect.hasAssertions();
 
-        const { esm } = await determineModuleTypes();
+        const { esm } = determineModuleTypes();
 
         expect(esm).toIncludeAllMembers([
             'dual-cjs-esm-1',
@@ -42,10 +42,10 @@ describe('[ASYNC API] webpack-node-module-types', () => {
         ]);
     });
 
-    it('deals with scoped packages', async () => {
+    it('deals with scoped packages', () => {
         expect.hasAssertions();
 
-        const { esm } = await determineModuleTypes();
+        const { esm } = determineModuleTypes();
 
         expect(esm).toIncludeAllMembers([
             '@namespace/dual-cjs-esm-4',
@@ -53,49 +53,49 @@ describe('[ASYNC API] webpack-node-module-types', () => {
         ]);
     });
 
-    it('ignores non-package directories under node_modules', async () => {
+    it('ignores non-package directories under node_modules', () => {
         expect.hasAssertions();
 
-        const { esm, cjs } = await determineModuleTypes();
+        const { esm, cjs } = determineModuleTypes();
 
         expect(cjs).toHaveLength(4);
         expect(esm).toHaveLength(9);
     });
 
-    it('throws on encountering illegal scope', async () => {
+    it('throws on encountering illegal scope', () => {
         expect.hasAssertions();
         process.chdir(joinPath(pathToBadNodeModules, 'bad-1'));
 
-        await expect(determineModuleTypes()).rejects.toThrow(/illegally-scoped/);
+        expect(() => determineModuleTypes()).toThrow(/illegally-scoped/);
     });
 
-    it('throws gracefully on JSON parse error', async () => {
+    it('throws gracefully on JSON parse error', () => {
         expect.hasAssertions();
         process.chdir(joinPath(pathToBadNodeModules, 'bad-2'));
 
-        await expect(determineModuleTypes()).rejects.toThrow(/failed parsing/);
+        expect(() => determineModuleTypes()).toThrow(/failed parsing/);
     });
 
-    it('throws if it cannot find package.json', async () => {
+    it('throws if it cannot find package.json', () => {
         expect.hasAssertions();
         process.chdir(joinPath(pathToBadNodeModules, 'bad-3'));
 
-        await expect(determineModuleTypes()).rejects.toThrow(/no such file/);
+        expect(() => determineModuleTypes()).toThrow(/no such file/);
     });
 
-    it('caches results', async () => {
+    it('caches results', () => {
         expect.hasAssertions();
         process.chdir(__dirname);
 
-        expect((await determineModuleTypes()).cjs).toBe((await determineModuleTypes()).cjs);
-        expect((await determineModuleTypes()).esm).toBe((await determineModuleTypes()).esm);
+        expect((determineModuleTypes()).cjs).toBe((determineModuleTypes()).cjs);
+        expect((determineModuleTypes()).esm).toBe((determineModuleTypes()).esm);
     });
 
-    it('ignores foreign files in node_modules directory', async () => {
+    it('ignores foreign files in node_modules directory', () => {
         expect.hasAssertions();
         process.chdir(joinPath(pathToBadNodeModules, 'bad-4'));
 
         // ? Does not throw
-        await expect(determineModuleTypes()).resolves.toBeDefined();
+        expect(() => determineModuleTypes()).not.toThrow();
     });
 });

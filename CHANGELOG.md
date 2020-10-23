@@ -1,3 +1,4 @@
+[v1.0.1]: https://github.com/Xunnamius/webpack-node-module-types/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/Xunnamius/webpack-node-module-types/releases/tag/v1.0.0
 
 [https://keepachangelog.com/en/1.0.0/]::
@@ -21,6 +22,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 (no notes yet)
 
 ## Released
+
+### [![v1.0.1](https://api.ergodark.com/badges/github-tag-date/xunnamius/webpack-node-module-types/v1.0.1)][v1.0.1]
+#### Added
+- Synchronous and asynchronous entry points via (`/sync` and `/async`). The
+  default bare export still returns the asynchronous API.
+
+#### Changed
+- Updated README
+- Added more tests
+
+---
 
 ### [![v1.0.0](https://api.ergodark.com/badges/github-tag-date/xunnamius/webpack-node-module-types/v1.0.0)][v1.0.0]
 #### Added
