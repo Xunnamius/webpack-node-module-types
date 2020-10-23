@@ -30,7 +30,7 @@ npm install --save-dev webpack-node-module-types
 
 ## Usage
 
-In addition to the bare import, this module exports two deep imports: `/sync`
+In addition to the bare import, this module exports two deep exports: `/sync`
 and `/async`.
 
 ```TypeScript
