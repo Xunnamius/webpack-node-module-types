@@ -11,3 +11,5 @@
 /tmp-docs-diff
 /docs-diff
 /bundle-stats.json
+/sync/*.d.ts
+/async/*.d.ts
