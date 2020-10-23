@@ -38,7 +38,7 @@ Usage example from [Node's REPL](https://nodejs.org/api/repl.html#repl_repl)
 listing this package's own CJS and ESM dependencies:
 
 ```JavaScript
-x.determineModuleTypes().then(c => console.log(c))
+determineModuleTypes().then(c => console.log(c))
 Promise { <pending> }
 > {
   cjs: [
