@@ -39,10 +39,10 @@
     "/async"
   ],
   "scripts": {
-    "build": "npm run clean && tsc --project tsconfig.types.json && NODE_ENV=production webpack --config-name main && cp -f dist/index.d.ts async/index.d.ts && cp -f dist/sync.d.ts sync/index.d.ts",
+    "build": "npm run clean && tsc --project tsconfig.types.json && NODE_ENV=production webpack --config-name main && mkdir async sync && cp -f dist/index.d.ts async/index.d.ts && cp -f dist/sync.d.ts sync/index.d.ts && echo \"module.exports = require('../dist/sync');\" > sync/index.js && echo \"module.exports = require('../dist/index');\" > async/index.js",
     "build-stats": "NODE_ENV=production webpack --config-name main --json > bundle-stats.json",
     "check-types": "rm -f npm.pipe; touch npm.pipe; command -v unbuffer >/dev/null; X=$?; [ $X -eq 0 ] && unbuffer tsc --project tsconfig.check-types.json >> npm.pipe; Y=$?; [ $Y -eq 0 ] && echo >> npm.pipe; unbuffer eslint --parser-options=project:tsconfig.check-types.json src >> npm.pipe; Z=$?; [ $X -ne 0 ] && tsc --project tsconfig.check-types.json >> npm.pipe && eslint --parser-options=project:tsconfig.check-types.json src >> npm.pipe; W=$?; cat npm.pipe | less -R -FX; rm npm.pipe; [ $W -eq 0 ] && [ $X -eq 1 ] || [ $X -eq 0 ] && [ $Y -eq 0 ] && [ $Z -eq 0 ]",
-    "clean": "rm -rf dist npm.pipe coverage external-scripts/bin",
+    "clean": "rm -rf dist npm.pipe coverage external-scripts/bin async sync",
     "list-tasks": "npm run",
     "prepublishOnly": "npm run build",
     "postpublish": "npm run clean",
