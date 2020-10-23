@@ -1,6 +1,13 @@
-import { determineModuleTypes } from '../src/index'
+import { determineModuleTypes, clearCache } from '../src/index'
+import { join as joinPath } from 'path'
 
 process.chdir(__dirname);
+
+const pathToBadNodeModules = joinPath(__dirname, 'node_modules', '@namespace', 'dual-cjs-esm-4');
+
+beforeEach(() => {
+    clearCache();
+})
 
 describe('webpack-node-module-types', () => {
     it('differentiates CJS and ESM packages', async () => {
@@ -53,5 +60,42 @@ describe('webpack-node-module-types', () => {
 
         expect(cjs).toHaveLength(4);
         expect(esm).toHaveLength(9);
+    });
+
+    it('throws on encountering illegal scope', async () => {
+        expect.hasAssertions();
+        process.chdir(joinPath(pathToBadNodeModules, 'bad-1'));
+
+        await expect(determineModuleTypes()).rejects.toThrow(/illegally-scoped/);
+    });
+
+    it('throws gracefully on JSON parse error', async () => {
+        expect.hasAssertions();
+        process.chdir(joinPath(pathToBadNodeModules, 'bad-2'));
+
+        await expect(determineModuleTypes()).rejects.toThrow(/failed parsing/);
+    });
+
+    it('throws if it cannot find package.json', async () => {
+        expect.hasAssertions();
+        process.chdir(joinPath(pathToBadNodeModules, 'bad-3'));
+
+        await expect(determineModuleTypes()).rejects.toThrow(/no such file/);
+    });
+
+    it('caches results', async () => {
+        expect.hasAssertions();
+        process.chdir(__dirname);
+
+        expect((await determineModuleTypes()).cjs).toBe((await determineModuleTypes()).cjs);
+        expect((await determineModuleTypes()).esm).toBe((await determineModuleTypes()).esm);
+    });
+
+    it('ignores foreign files in node_modules directory', async () => {
+        expect.hasAssertions();
+        process.chdir(joinPath(pathToBadNodeModules, 'bad-4'));
+
+        // ? Does not throw
+        await expect(determineModuleTypes()).resolves.toBeDefined();
     });
 });

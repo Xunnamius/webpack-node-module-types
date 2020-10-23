@@ -17,9 +17,6 @@ const isCjs = async (path: string) => {
             module?: string,
         } = JSON.parse((await readFile(joinPath(path, 'package.json'), { encoding: 'utf-8' })));
 
-        if(!pkg)
-            throw new Error(`could not find package.json`);
-
         // * https://nodejs.org/api/esm.html#esm_packages
         // We classify a package as ESM if its package.json has:
         //   - a `module` key
@@ -49,37 +46,46 @@ const isCjs = async (path: string) => {
     }
 };
 
+const determine = async (dir: string, scoped = false) => {
+    await Promise.all((await readdir(dir)).map(file => {
+        return (async () => {
+            const path = joinPath(dir, file);
+
+            if((await stat(path)).isDirectory()) {
+                if(!file.startsWith('.')) {
+                    if(file.startsWith('@')) {
+                        if(scoped) throw new Error(`encountered illegally-scoped package at "${path}"`);
+                        await determine(path, true);
+                    }
+
+                    else {
+                        (await isCjs(path) ? cjs : esm).push(scoped ? `${basename(dir)}/${file}` : file);
+                    }
+                }
+            }
+        })();
+    }));
+};
+
 /**
  * Returns an object with keys `cjs` and `esm` each pointing to an array of
  * strings representing CJS and ES modules under node_modules, respectively.
  */
 export async function determineModuleTypes() {
     if(!determined) {
-        const MODULES_ROOT = joinPath(process.cwd(), 'node_modules');
-
-        const determine = async (dir: string, scoped = false) => Promise.all((await readdir(dir)).map(file => {
-            const path = joinPath(dir, file);
-
-            return (async () => {
-                if((await stat(path)).isDirectory()) {
-                    if(!file.startsWith('.')) {
-                        if(file.startsWith('@')) {
-                            if(scoped) throw new Error(`encountered double-scoped package at "${path}"`);
-                            await determine(path, true);
-                        }
-
-                        else {
-                            (await isCjs(path) ? cjs : esm).push(scoped ? `${basename(dir)}/${file}` : file);
-                        }
-                    }
-                }
-            })();
-        }));
-
-        await determine(MODULES_ROOT);
-
+        await determine(joinPath(process.cwd(), 'node_modules'));
         determined = true;
     }
 
     return { cjs, esm };
+}
+
+/**
+ * Clear the internal cache (refresh view of node_modules). Otherwise, the
+ * results of `determineModuleTypes()` is memoized.
+ */
+export function clearCache() {
+    cjs.splice(0, cjs.length);
+    esm.splice(0, esm.length);
+    determined = false;
 }

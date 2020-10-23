@@ -10,12 +10,17 @@
 # webpack-node-module-types
 
 This package attempts to determine the module type (ESM/`.mjs` vs
-CJS/`.cjs`/`.js`) of each top-level package in `node_modules/`. This plugin
-should come to the same determination about a module's type as Webpack does in
-the vast majority of cases.
+CJS/`.cjs`/`.js`) of each top-level package in `node_modules/`, including scoped
+packages. This plugin should come to the same determination about a module's
+type as Webpack does in the vast majority of cases.
 
-Originally created to gather module metadata for
-[babel-plugin-transform-mjs-imports](https://github.com/Xunnamius/babel-plugin-transform-mjs-imports).
+The resolution algorithm is similar to
+[Node's](https://nodejs.org/api/esm.html#esm_resolution_algorithm) with the
+additional awareness of the `module` key. This package was originally created
+for
+[babel-plugin-transform-mjs-imports](https://github.com/Xunnamius/babel-plugin-transform-mjs-imports)
+to help smooth over Typescript-to-CJS/ESM transpilation issues, but can be
+useful whenever one needs to know how bundlers will attempt to load a package.
 
 ## Installation
 
@@ -27,12 +32,166 @@ npm install --save-dev webpack-node-module-types
 
 ```TypeScript
 import { determineModuleTypes } from 'webpack-node-module-types'
-
-const { cjs, esm } = determineModuleTypes();
-
-console.log('array of CJS module name strings (including scope if applicable):', cjs);
-console.log('array of ESM name strings (including scope if applicable):', esm);
 ```
+
+Usage example from [Node's REPL](https://nodejs.org/api/repl.html#repl_repl)
+listing this package's own CJS and ESM dependencies:
+
+```JavaScript
+x.determineModuleTypes().then(c => console.log(c))
+Promise { <pending> }
+> {
+  cjs: [
+    'acorn-globals',
+    'abab',
+    'acorn-jsx',
+    'ajv',
+    'ansi-colors',
+    'ansi-escapes',
+    'ajv-keywords',
+    'ansi-styles',
+    'ansi-regex',
+    'anymatch',
+    'argparse',
+    'arr-flatten',
+    'arr-diff',
+    'arr-union',
+    'array-includes',
+    'array-union',
+    'array.prototype.flat',
+    'array-unique',
+    'asn1',
+    'assign-symbols',
+    'assert-plus',
+    'async-each',
+    'astral-regex',
+    'asynckit',
+    'atob',
+    'aws4',
+    'babel-eslint',
+    'babel-jest',
+    'aws-sign2',
+    'babel-loader',
+    'babel-plugin-dynamic-import-node',
+    'babel-plugin-istanbul',
+    'babel-plugin-jest-hoist',
+    'babel-preset-jest',
+    'base',
+    'balanced-match',
+    'bcrypt-pbkdf',
+    'babel-preset-current-node-syntax',
+    'binary-extensions',
+    'braces',
+    'browser-process-hrtime',
+    'brace-expansion',
+    'bser',
+    'browserslist',
+    'buffer-from',
+    'cache-base',
+    'callsites',
+    'caniuse-lite',
+    'capture-exit',
+    'caseless',
+    'camelcase',
+    'chalk',
+    'chokidar',
+    'char-regex',
+    'ci-info',
+    'class-utils',
+    'chrome-trace-event',
+    'cliui',
+    'co',
+    'collect-v8-coverage',
+    'color-convert',
+    'collection-visit',
+    'color-name',
+    'combined-stream',
+    'commander',
+    'command-line-usage',
+    'component-emitter',
+    'commondir',
+    'concat-map',
+    'copy-descriptor',
+    'convert-source-map',
+    'cross-spawn',
+    'core-util-is',
+    'core-js-compat',
+    'cssom',
+    'data-urls',
+    'contains-path',
+    'cssstyle',
+    'debug',
+    'dashdash',
+    'decode-uri-component',
+    'decamelize',
+    'dedent',
+    'deep-is',
+    'deep-extend',
+    'deepmerge',
+    'define-property',
+    'define-properties',
+    'detect-newline',
+    'domexception',
+    'delayed-stream',
+    'diff-sequences',
+    'dir-glob',
+    'doctrine',
+    'ecc-jsbn',
+    'emittery',
+    'electron-to-chromium',
+    'emoji-regex',
+    'emojis-list',
+    'end-of-stream',
+    ... 529 more items
+  ],
+  esm: [
+    'acorn',
+    'acorn-walk',
+    'array-back',
+    'babel-plugin-source-map-support',
+    'big.js',
+    'colorette',
+    'decimal.js',
+    'escalade',
+    'eslint-import-resolver-typescript',
+    'eslint-utils',
+    'esquery',
+    'flatted',
+    'get-package-type',
+    'html-escaper',
+    'json5',
+    'lines-and-columns',
+    'punycode',
+    'rsvp',
+    'terser',
+    'tslib',
+    'uuid',
+    '@sinonjs/fake-timers',
+    '@webassemblyjs/ast',
+    '@webassemblyjs/floating-point-hex-parser',
+    '@webassemblyjs/helper-api-error',
+    '@webassemblyjs/helper-buffer',
+    '@webassemblyjs/helper-code-frame',
+    '@webassemblyjs/helper-fsm',
+    '@webassemblyjs/helper-wasm-bytecode',
+    '@webassemblyjs/helper-wasm-section',
+    '@webassemblyjs/helper-module-context',
+    '@webassemblyjs/ieee754',
+    '@webassemblyjs/leb128',
+    '@webassemblyjs/wasm-edit',
+    '@webassemblyjs/utf8',
+    '@webassemblyjs/wasm-opt',
+    '@webassemblyjs/wasm-parser',
+    '@webassemblyjs/wasm-gen',
+    '@webassemblyjs/wast-parser',
+    '@webassemblyjs/wast-printer',
+    '@xtuc/ieee754'
+  ]
+}
+```
+
+As of November 2020, most of this package's dependencies are *not* offering ESM
+entry points 🤯
 
 ## Contributing
 
