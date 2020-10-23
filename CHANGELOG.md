@@ -1,3 +1,4 @@
+[v1.0.2]: https://github.com/Xunnamius/webpack-node-module-types/compare/v1.0.1...v1.0.2
 [v1.0.1]: https://github.com/Xunnamius/webpack-node-module-types/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/Xunnamius/webpack-node-module-types/releases/tag/v1.0.0
 
@@ -22,6 +23,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 (no notes yet)
 
 ## Released
+
+### [![v1.0.2](https://api.ergodark.com/badges/github-tag-date/xunnamius/webpack-node-module-types/v1.0.2)][v1.0.2]
+#### Added
+- Backwards compat with Node versions all the way back to v10 LTS
+
+---
 
 ### [![v1.0.1](https://api.ergodark.com/badges/github-tag-date/xunnamius/webpack-node-module-types/v1.0.1)][v1.0.1]
 #### Added

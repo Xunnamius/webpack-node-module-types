@@ -1,5 +1,7 @@
-import { readdir, stat, readFile } from 'fs/promises'
+import fs from 'fs'
 import { join as joinPath, basename } from 'path'
+
+const { readdir, stat, readFile } = fs.promises;
 
 let determined = false;
 const cjs: string[] = [];
