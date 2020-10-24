@@ -1,6 +1,6 @@
 {
   "name": "webpack-node-module-types",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Attempts to classify each dependency under node_modules as a CJS or ESM package",
   "keywords": [
     "node",
