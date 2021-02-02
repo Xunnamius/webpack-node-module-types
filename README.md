@@ -18,7 +18,7 @@ present as CJS format but return , an ES module might be misclassified as CJS.
 The resolution algorithm is based on
 [Node's ESM_FORMAT algorithm to determine module format](https://nodejs.org/api/esm.html#esm_resolution_algorithm)
 with the additional awareness of the `module` key; hence, we classify a package
-as ESM if its `package.json` has:
+as ESM if its `package.json` has any of the following:
 
 - A `main` key with a value ending in '.mjs'
 - A sub-key (any depth) of the `export` key with a value ending in '.mjs'
