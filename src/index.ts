@@ -18,12 +18,12 @@ const isCjs = async (path: string) => {
             module?: string,
         } = JSON.parse((await readFile(joinPath(path, 'package.json'), { encoding: 'utf-8' })));
 
-        // * https://nodejs.org/api/esm.html#esm_packages
+        // * https://nodejs.org/api/esm.html#esm_resolution_algorithm
         // We classify a package as ESM if its package.json has:
         //   - a `module` key
         //   - a `type` key with the value 'module'
         //   - a `main` key with a value ending in '.mjs'
-        //   - a sub-key (any depth) of the `export` key with a value ending in '.mjs'
+        //   - a sub-key (any depth) of `export` with a value ending in '.mjs'
         //
         // Otherwise, we classify it as a CJS package
 

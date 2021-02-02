@@ -5,22 +5,34 @@
 [![Pull requests](https://img.shields.io/github/issues-pr/xunnamius/webpack-node-module-types "Number of open pull requests")](https://www.npmjs.com/package/webpack-node-module-types)
 [![DavidDM dependencies](https://img.shields.io/david/xunnamius/webpack-node-module-types "Status of this package's dependencies")](https://david-dm.org/xunnamius/webpack-node-module-types)
 [![Source license](https://img.shields.io/npm/l/webpack-node-module-types "This package's source license")](https://www.npmjs.com/package/webpack-node-module-types)
-[![NPM version](https://api.ergodark.com/badges/npm-pkg-version/webpack-node-module-types "Install this package using npm or yarn!")](https://www.npmjs.com/package/webpack-node-module-types)
+[![NPM version](https://api.ergodark.com/badges/npm-pkg-version/webpack-node-module-types 'Install this package using npm or yarn!')](https://www.npmjs.com/package/webpack-node-module-types)
 
 # webpack-node-module-types
 
 This package attempts to determine the module type (ESM/`.mjs` vs
 CJS/`.cjs`/`.js`) of each top-level package in `node_modules/`, including scoped
-packages. This plugin should come to the same determination about a module's
-type as Webpack does in the vast majority of cases.
+packages. It comes to the same determination about a module's type as Webpack
+does in the vast majority of cases. In other cases, like with modules that
+present as CJS format but return , an ES module might be misclassified as CJS.
 
-The resolution algorithm is similar to
-[Node's](https://nodejs.org/api/esm.html#esm_resolution_algorithm) with the
-additional awareness of the `module` key. This package was originally created
-for
-[babel-plugin-transform-mjs-imports](https://github.com/Xunnamius/babel-plugin-transform-mjs-imports)
+The resolution algorithm is based on
+[Node's ESM_FORMAT algorithm to determine module format](https://nodejs.org/api/esm.html#esm_resolution_algorithm)
+with the additional awareness of the `module` key; hence, we classify a package
+as ESM if its `package.json` has:
+
+- A `main` key with a value ending in '.mjs'
+- A sub-key (any depth) of the `export` key with a value ending in '.mjs'
+- A `type` key with the value 'module'
+- A `module` key
+
+It cannot be determined through package metadata if a module exports
+`__esModule = true`, so transpiled ES modules that don't meet the above
+requirements will be misclassified.
+
+This package was originally created for
+[babel-plugin-transform-default-named-imports](https://github.com/Xunnamius/babel-plugin-transform-default-named-imports)
 to help smooth over Typescript-to-CJS/ESM transpilation issues, but can be
-useful whenever one needs to know how bundlers will attempt to load a package.
+useful whenever one needs to know how Webpack will attempt to load a package.
 
 ## Installation
 
@@ -201,7 +213,7 @@ undefined
 }
 ```
 
-As of November 2020, most of this package's dependencies are *not* offering ESM
+As of February 2021, most of this package's dependencies are _not_ offering ESM
 entry points 🤯
 
 ## Contributing
@@ -238,7 +250,7 @@ this project.
 
 - `npm run clean` to delete all build process artifacts
 - `npm run build` to compile `src/` into `dist/`, which is what makes it into
-the published package
+  the published package
 - `npm run build-docs` to re-build the documentation
 - `npm run build-externals` to compile `external-scripts/` into
   `external-scripts/bin/`
@@ -262,7 +274,7 @@ the published package
 ## Package Details
 
 > You don't need to read this section to use this package, everything should
-"just work"!
+> "just work"!
 
 This is a simple [CJS2](https://github.com/webpack/webpack/issues/1114) package
 with a default export.
@@ -278,7 +290,10 @@ declarations file.
 
 See [CHANGELOG.md](CHANGELOG.md).
 
-[side-effects-key]: https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free
-[exports-main-key]: https://github.com/nodejs/node/blob/8d8e06a345043bec787e904edc9a2f5c5e9c275f/doc/api/packages.md#package-entry-points
+[side-effects-key]:
+  https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free
+[exports-main-key]:
+  https://github.com/nodejs/node/blob/8d8e06a345043bec787e904edc9a2f5c5e9c275f/doc/api/packages.md#package-entry-points
 [tree-shaking]: https://webpack.js.org/guides/tree-shaking
-[local-pkg]: https://github.com/nodejs/node/blob/8d8e06a345043bec787e904edc9a2f5c5e9c275f/doc/api/packages.md#type
+[local-pkg]:
+  https://github.com/nodejs/node/blob/8d8e06a345043bec787e904edc9a2f5c5e9c275f/doc/api/packages.md#type
