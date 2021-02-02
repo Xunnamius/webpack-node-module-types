@@ -26,7 +26,7 @@ as ESM if its `package.json` has any of the following:
 - A `module` key
 
 It cannot be determined through package metadata if a module exports
-`__esModule = true`, so transpiled ES modules that don't meet the above
+`__esModule = true`, so transpiled ES modules that don't meet any of the above
 requirements will be misclassified.
 
 This package was originally created for
