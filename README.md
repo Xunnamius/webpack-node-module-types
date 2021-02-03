@@ -13,7 +13,7 @@ This package attempts to determine the module type (ESM/`.mjs` vs
 CJS/`.cjs`/`.js`) of each top-level package in `node_modules/`, including scoped
 packages. It comes to the same determination about a module's type as Webpack
 does in the vast majority of cases. In other cases, like with modules that
-present as CJS format but return , an ES module might be misclassified as CJS.
+present as CJS format, an ES module might be misclassified as CJS.
 
 The resolution algorithm is based on
 [Node's ESM_FORMAT algorithm to determine module format](https://nodejs.org/api/esm.html#esm_resolution_algorithm)
@@ -25,7 +25,7 @@ as ESM if its `package.json` has any of the following:
 - A `type` key with the value 'module'
 - A `module` key
 
-It cannot be determined through package metadata if a module exports
+It cannot be determined through package metadata alone if a module exports
 `__esModule = true`, so transpiled ES modules that don't meet any of the above
 requirements will be misclassified.
 
