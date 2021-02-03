@@ -20,9 +20,9 @@ The resolution algorithm is based on
 with the additional awareness of the `module` key; hence, we classify a package
 as ESM if its `package.json` has any of the following:
 
-- A `main` key with a value ending in '.mjs'
-- A sub-key (any depth) of the `export` key with a value ending in '.mjs'
-- A `type` key with the value 'module'
+- A `main` key with a value ending in `".mjs"`
+- A sub-key (any depth) of the `export` key with a value ending in `".mjs"`
+- A `type` key with the value `"module"`
 - A `module` key
 
 It cannot be determined through package metadata alone if a module exports
