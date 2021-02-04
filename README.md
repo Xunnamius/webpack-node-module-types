@@ -3,7 +3,6 @@
 [![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/webpack-node-module-types "When was the last commit to the official repo?")](https://www.npmjs.com/package/webpack-node-module-types)
 [![Open issues](https://img.shields.io/github/issues/xunnamius/webpack-node-module-types "Number of known issues with this package")](https://www.npmjs.com/package/webpack-node-module-types)
 [![Pull requests](https://img.shields.io/github/issues-pr/xunnamius/webpack-node-module-types "Number of open pull requests")](https://www.npmjs.com/package/webpack-node-module-types)
-[![DavidDM dependencies](https://img.shields.io/david/xunnamius/webpack-node-module-types "Status of this package's dependencies")](https://david-dm.org/xunnamius/webpack-node-module-types)
 [![Source license](https://img.shields.io/npm/l/webpack-node-module-types "This package's source license")](https://www.npmjs.com/package/webpack-node-module-types)
 [![NPM version](https://api.ergodark.com/badges/npm-pkg-version/webpack-node-module-types 'Install this package using npm or yarn!')](https://www.npmjs.com/package/webpack-node-module-types)
 
