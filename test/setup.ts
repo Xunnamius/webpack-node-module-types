@@ -1,3 +1,4 @@
+import 'jest-extended/all';
 import 'jest-extended';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
