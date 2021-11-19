@@ -5,7 +5,8 @@ import { asMockedFunction } from './setup';
 // TODO: use fixtures lib
 
 const polyrepoDir = `${__dirname}/fixtures/polyrepo-1`;
-const monorepoDir = `${__dirname}/fixtures/monorepo-1/packages/fake-pkg`;
+const monorepo1Dir = `${__dirname}/fixtures/monorepo-1/packages/fake-pkg`;
+const monorepo2Dir = `${__dirname}/fixtures/monorepo-2/packages/fake-pkg`;
 
 const pathActual = jest.requireActual('path');
 const joinPath = pathActual.join;
@@ -43,7 +44,6 @@ describe('[SYNC API] webpack-node-module-types', () => {
     const { cjs, esm } = determineModuleTypes();
 
     expect(cjs).toIncludeAllMembers(['cjs-1', 'cjs-2', 'cjs-3', 'cjs-4']);
-
     expect(esm).toIncludeAllMembers(['esm-1', 'esm-2', 'esm-3', 'esm-4']);
   });
 
@@ -118,7 +118,7 @@ describe('[SYNC API] webpack-node-module-types', () => {
   it('upward root mode: enables monorepo compatibility', () => {
     expect.hasAssertions();
 
-    process.chdir(monorepoDir);
+    process.chdir(monorepo1Dir);
     const { cjs, esm } = determineModuleTypes({ rootMode: 'upward' });
 
     expect(cjs).toIncludeSameMembers([
@@ -147,7 +147,7 @@ describe('[SYNC API] webpack-node-module-types', () => {
   it('upward root mode: local node_modules overrides root node_modules in monorepo package dir', () => {
     expect.hasAssertions();
 
-    process.chdir(monorepoDir);
+    process.chdir(monorepo1Dir);
     const { cjs, esm } = determineModuleTypes({ rootMode: 'upward' });
 
     expect(cjs).toContain('@namespace/dual-cjs-esm-5');
@@ -166,7 +166,7 @@ describe('[SYNC API] webpack-node-module-types', () => {
 
     mockedDirname.mockImplementationOnce(() => pathActual.sep);
 
-    process.chdir(monorepoDir);
+    process.chdir(monorepo1Dir);
     expect(() => determineModuleTypes({ rootMode: 'upward' })).toThrow(
       /failed to find node_modules/
     );
@@ -183,7 +183,7 @@ describe('[SYNC API] webpack-node-module-types', () => {
 
     mockedDirname.mockImplementationOnce(() => '');
 
-    process.chdir(monorepoDir);
+    process.chdir(monorepo1Dir);
     expect(() => determineModuleTypes({ rootMode: 'upward' })).toThrow(
       /failed to find node_modules/
     );
@@ -196,7 +196,36 @@ describe('[SYNC API] webpack-node-module-types', () => {
       throw new Error('badbadnotgood');
     });
 
-    process.chdir(monorepoDir);
+    process.chdir(monorepo1Dir);
     expect(() => determineModuleTypes({ rootMode: 'upward' })).toThrow(/badbadnotgood/);
+  });
+
+  it('upward root mode: ignores ENOENT errors for non-existent local node_modules', () => {
+    expect.hasAssertions();
+    process.chdir(monorepo2Dir);
+
+    let cjs, esm;
+
+    expect(
+      () => ({ cjs, esm } = determineModuleTypes({ rootMode: 'upward' }))
+    ).not.toThrow();
+
+    expect(cjs).toIncludeAllMembers(['cjs-1', 'cjs-2', 'cjs-3', 'cjs-4']);
+    expect(esm).toIncludeAllMembers(['esm-1', 'esm-2', 'esm-3', 'esm-4']);
+  });
+
+  it('upward root mode: re-throws non-ENOENT errors when looking for local node_modules', () => {
+    expect.hasAssertions();
+    process.chdir(monorepo2Dir);
+
+    mockedDirname.mockImplementationOnce(() => {
+      throw new Error('wrong error');
+    });
+
+    mockedJoin.mockImplementationOnce(() => {
+      throw new Error('right error');
+    });
+
+    expect(() => determineModuleTypes({ rootMode: 'upward' })).toThrow(/right error/);
   });
 });

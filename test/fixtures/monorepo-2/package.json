@@ -1,0 +1,6 @@
+{
+  "name": "monorepo-1",
+  "workspaces": [
+    "packages/fake-pkg"
+  ]
+}

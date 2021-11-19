@@ -73,9 +73,16 @@ export function determineModuleTypes(
 ) {
   if (!determined) {
     const cwd = process.cwd();
-    determine(joinPath(cwd, 'node_modules'));
 
     if (rootMode == 'upward') {
+      try {
+        determine(joinPath(cwd, 'node_modules'));
+      } catch (e) {
+        if ((e as { code?: string }).code !== 'ENOENT') {
+          throw e;
+        }
+      }
+
       let parent = cwd;
       // eslint-disable-next-line no-constant-condition
       while (true) {
@@ -84,7 +91,7 @@ export function determineModuleTypes(
           determine(joinPath(parent, 'node_modules'));
           break;
         } catch (e) {
-          if (e && (e as { code?: string }).code === 'ENOENT') {
+          if ((e as { code?: string }).code === 'ENOENT') {
             if (dirname(parent).lastIndexOf(sep) <= 0) {
               throw new Error(
                 'failed to find node_modules directory in any parent dir in upward root mode'
@@ -97,7 +104,10 @@ export function determineModuleTypes(
           }
         }
       }
+    } else {
+      determine(joinPath(cwd, 'node_modules'));
     }
+
     determined = true;
   }
 
