@@ -32,6 +32,5 @@ module.exports = {
   module: {
     rules: [{ test: /\.(ts|js)x?$/, loader: 'babel-loader', exclude: /node_modules/ }]
   },
-  optimization: { usedExports: true },
-  ignoreWarnings: [/critical dependency:/i]
+  optimization: { usedExports: true }
 };
