@@ -17,7 +17,7 @@
     "type": "git",
     "url": "https://github.com/Xunnamius/webpack-node-module-types"
   },
-  "license": "Unlicense",
+  "license": "MIT",
   "author": "Xunnamius",
   "sideEffects": false,
   "type": "commonjs",
