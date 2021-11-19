@@ -16,9 +16,7 @@ const isCjs = async (path: string) => {
       main?: string;
       exports: Export;
       module?: string;
-    } = JSON.parse(
-      await readFile(joinPath(path, 'package.json'), { encoding: 'utf-8' })
-    );
+    } = JSON.parse(await readFile(joinPath(path, 'package.json'), { encoding: 'utf-8' }));
 
     // * https://nodejs.org/api/esm.html#esm_resolution_algorithm
     // We classify a package as ESM if its package.json has:
@@ -42,9 +40,7 @@ const isCjs = async (path: string) => {
       isMjsExtensionInExportObject(pkg.exports)
     );
   } catch (e) {
-    throw new Error(
-      `failed parsing package.json for module at "${path}": ${e}`
-    );
+    throw new Error(`failed parsing package.json for module at "${path}": ${e}`);
   }
 };
 
@@ -60,9 +56,7 @@ const determine = async (dir: string, scoped = false) => {
           if (!file.startsWith('.')) {
             if (file.startsWith('@')) {
               if (scoped)
-                throw new Error(
-                  `encountered illegally-scoped package at "${path}"`
-                );
+                throw new Error(`encountered illegally-scoped package at "${path}"`);
               await determine(path, true);
             } else {
               const pkg = scoped ? `${basename(dir)}/${file}` : file;

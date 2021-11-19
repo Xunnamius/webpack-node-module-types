@@ -1,8 +1,4 @@
-import {
-  readdirSync as readdir,
-  statSync as stat,
-  readFileSync as readFile
-} from 'fs';
+import { readdirSync as readdir, statSync as stat, readFileSync as readFile } from 'fs';
 
 import { join as joinPath, basename, dirname, sep } from 'path';
 
@@ -19,9 +15,7 @@ const isCjs = (path: string) => {
       main?: string;
       exports: Export;
       module?: string;
-    } = JSON.parse(
-      readFile(joinPath(path, 'package.json'), { encoding: 'utf-8' })
-    );
+    } = JSON.parse(readFile(joinPath(path, 'package.json'), { encoding: 'utf-8' }));
 
     // * https://nodejs.org/api/esm.html#esm_packages
     // We classify a package as ESM if its package.json has:
@@ -45,9 +39,7 @@ const isCjs = (path: string) => {
       isMjsExtensionInExportObject(pkg.exports)
     );
   } catch (e) {
-    throw new Error(
-      `failed parsing package.json for module at "${path}": ${e}`
-    );
+    throw new Error(`failed parsing package.json for module at "${path}": ${e}`);
   }
 };
 
@@ -59,9 +51,7 @@ const determine = (dir: string, scoped = false) => {
       if (!file.startsWith('.')) {
         if (file.startsWith('@')) {
           if (scoped)
-            throw new Error(
-              `encountered illegally-scoped package at "${path}"`
-            );
+            throw new Error(`encountered illegally-scoped package at "${path}"`);
           determine(path, true);
         } else {
           const pkg = scoped ? `${basename(dir)}/${file}` : file;

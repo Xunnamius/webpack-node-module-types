@@ -197,8 +197,6 @@ describe('[SYNC API] webpack-node-module-types', () => {
     });
 
     process.chdir(monorepoDir);
-    expect(() => determineModuleTypes({ rootMode: 'upward' })).toThrow(
-      /badbadnotgood/
-    );
+    expect(() => determineModuleTypes({ rootMode: 'upward' })).toThrow(/badbadnotgood/);
   });
 });

@@ -103,12 +103,8 @@ describe('[ASYNC API] webpack-node-module-types', () => {
   it('caches results', async () => {
     expect.hasAssertions();
 
-    expect((await determineModuleTypes()).cjs).toBe(
-      (await determineModuleTypes()).cjs
-    );
-    expect((await determineModuleTypes()).esm).toBe(
-      (await determineModuleTypes()).esm
-    );
+    expect((await determineModuleTypes()).cjs).toBe((await determineModuleTypes()).cjs);
+    expect((await determineModuleTypes()).esm).toBe((await determineModuleTypes()).esm);
   });
 
   it('ignores foreign files in node_modules directory', async () => {
@@ -171,9 +167,7 @@ describe('[ASYNC API] webpack-node-module-types', () => {
     mockedDirname.mockImplementationOnce(() => pathActual.sep);
 
     process.chdir(monorepoDir);
-    await expect(
-      determineModuleTypes({ rootMode: 'upward' })
-    ).rejects.toMatchObject({
+    await expect(determineModuleTypes({ rootMode: 'upward' })).rejects.toMatchObject({
       message: expect.stringContaining('failed to find node_modules')
     });
   });
@@ -190,9 +184,7 @@ describe('[ASYNC API] webpack-node-module-types', () => {
     mockedDirname.mockImplementationOnce(() => '');
 
     process.chdir(monorepoDir);
-    await expect(
-      determineModuleTypes({ rootMode: 'upward' })
-    ).rejects.toMatchObject({
+    await expect(determineModuleTypes({ rootMode: 'upward' })).rejects.toMatchObject({
       message: expect.stringContaining('failed to find node_modules')
     });
   });
@@ -205,8 +197,8 @@ describe('[ASYNC API] webpack-node-module-types', () => {
     });
 
     process.chdir(monorepoDir);
-    await expect(
-      determineModuleTypes({ rootMode: 'upward' })
-    ).rejects.toMatchObject({ message: 'badbadnotgood' });
+    await expect(determineModuleTypes({ rootMode: 'upward' })).rejects.toMatchObject({
+      message: 'badbadnotgood'
+    });
   });
 });
