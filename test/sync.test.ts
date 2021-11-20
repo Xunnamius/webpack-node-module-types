@@ -5,6 +5,7 @@ import { asMockedFunction } from './setup';
 // TODO: use fixtures lib
 
 const polyrepoDir = `${__dirname}/fixtures/polyrepo-1`;
+const polyrepo2Dir = `${__dirname}/fixtures/polyrepo-2`;
 const monorepo1Dir = `${__dirname}/fixtures/monorepo-1/packages/fake-pkg`;
 const monorepo2Dir = `${__dirname}/fixtures/monorepo-2/packages/fake-pkg`;
 
@@ -227,5 +228,67 @@ describe('[SYNC API] webpack-node-module-types', () => {
     });
 
     expect(() => determineModuleTypes({ rootMode: 'upward' })).toThrow(/right error/);
+  });
+
+  it('upward root mode: accepts relative path to arbitrary node_modules #1', () => {
+    expect.hasAssertions();
+    process.chdir(`${monorepo1Dir}/../..`);
+
+    const { cjs, esm } = determineModuleTypes({
+      rootMode: './packages/fake-pkg/node_modules'
+    });
+
+    expect(cjs).toIncludeSameMembers([
+      'cjs-1',
+      'cjs-2',
+      'cjs-3',
+      'cjs-4',
+      'cjs-5',
+      '@namespace/dual-cjs-esm-5'
+    ]);
+
+    expect(esm).toIncludeSameMembers([
+      'esm-1',
+      'esm-2',
+      'esm-3',
+      'esm-4',
+      'esm-5',
+      'dual-cjs-esm-1',
+      'dual-cjs-esm-2',
+      'dual-cjs-esm-3',
+      'dual-cjs-esm-6',
+      '@namespace/dual-cjs-esm-4'
+    ]);
+  });
+
+  it('upward root mode: accepts relative path to arbitrary node_modules #2', () => {
+    expect.hasAssertions();
+    process.chdir(polyrepo2Dir);
+
+    const { cjs, esm } = determineModuleTypes({
+      rootMode: '../monorepo-2/node_modules'
+    });
+
+    expect(cjs).toIncludeSameMembers(['cjs-1', 'cjs-2', 'cjs-3', 'cjs-4']);
+
+    expect(esm).toIncludeSameMembers([
+      'esm-1',
+      'esm-2',
+      'esm-3',
+      'esm-4',
+      'dual-cjs-esm-1',
+      'dual-cjs-esm-2',
+      'dual-cjs-esm-3',
+      '@namespace/dual-cjs-esm-4',
+      '@namespace/dual-cjs-esm-5'
+    ]);
+  });
+
+  it('upward root mode: throws on invalid rootMode value', () => {
+    expect.hasAssertions();
+
+    expect(() => determineModuleTypes({ rootMode: 'bad' })).toThrow(
+      /invalid rootMode option/
+    );
   });
 });

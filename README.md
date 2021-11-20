@@ -93,7 +93,7 @@ entry points 🤯
 
 ### Monorepo Support
 
-As of version `1.1.0`, `webpack-node-module-types` supports monorepo setups
+As of version `1.2.0`, `webpack-node-module-types` supports monorepo setups
 through the `rootMode` parameter. Similar to
 [Babel's root-mode flag](https://babeljs.io/docs/en/config-files#root-babelconfigjson-file),
 `{ rootMode: "upward" }` makes `webpack-node-module-types` search from the
@@ -101,14 +101,38 @@ working directory parent upward until it finds an additional `node_modules`
 directory to scrutinize. If no higher level `node_modules` directory is found,
 an error is thrown.
 
+Packages found under any local `node_modules` directory, if it exists, take
+precedence over those found in a higher-level `node_modules` directory.
+
 Example:
 
 ```TypeScript
+// process.cwd() => /repos/my-workspace/pkg-1
 const { determineModuleTypes } = require('webpack-node-module-types/sync');
 console.log(determineModuleTypes({ rootMode: "upward" }));
+// Will find:
+//   - /repos/my-workspace/packages/pkg-1/node_modules (highest precedence, optional)
+//   - /repos/my-workspace/node_modules
 ```
 
 > `rootMode` is set to "local" by default.
+
+In addition to `"upward"` and `"local"`, `rootMode` also accepts an explicit
+`node_modules` path (beginning with `./` or `../`) relative to the current
+working directory. When used in this way, packages found under the relative
+`node_modules` directory take precedence over those found in any local
+`node_modules` directory, if it exists.
+
+Example:
+
+```TypeScript
+// process.cwd() => /repos/my-workspace
+const { determineModuleTypes } = require('webpack-node-module-types/sync');
+console.log(determineModuleTypes({ rootMode: "./packages/pkg-1/node_modules" }));
+// Will find:
+//   - /repos/my-workspace/node_modules (optional)
+//   - /repos/my-workspace/packages/pkg-1/node_modules (highest precedence)
+```
 
 ## Documentation
 

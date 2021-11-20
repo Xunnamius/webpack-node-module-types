@@ -74,14 +74,27 @@ const determine = async (dir: string, scoped = false) => {
 /**
  * Returns an object with keys `cjs` and `esm` each pointing to an array of
  * strings representing CJS and ES modules under node_modules, respectively.
+ *
+ * Accepts a `rootMode` parameter of either `"local"`, `"upward"`, or a path to
+ * node_modules relative to the current working directory (starting with `"./"`
+ * or `"../"`). Defaults to `"local"`. If `"upward"` is used, package types in
+ * the local node_modules directory, if it exists, override those in any upward
+ * node_modules directory. On the other hand, if a relative path is given, its
+ * contents override those in any local node_modules directory if it exists.
  */
 export async function determineModuleTypes(
-  { rootMode }: { rootMode: 'local' | 'upward' } = { rootMode: 'local' }
+  { rootMode }: { rootMode: string } = { rootMode: 'local' }
 ) {
   if (!determined) {
     const cwd = process.cwd();
 
-    if (rootMode == 'upward') {
+    if (rootMode != 'local') {
+      const isRelativePath = rootMode.startsWith('./') || rootMode.startsWith('../');
+
+      if (isRelativePath) {
+        await determine(joinPath(cwd, rootMode));
+      }
+
       try {
         await determine(joinPath(cwd, 'node_modules'));
       } catch (e) {
@@ -90,27 +103,33 @@ export async function determineModuleTypes(
         }
       }
 
-      let parent = cwd;
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        try {
-          parent = dirname(parent);
-          // eslint-disable-next-line no-await-in-loop
-          await determine(joinPath(parent, 'node_modules'));
-          break;
-        } catch (e) {
-          if ((e as { code?: string }).code === 'ENOENT') {
-            if (dirname(parent).lastIndexOf(sep) <= 0) {
-              throw new Error(
-                'failed to find node_modules directory in any parent dir in upward root mode'
-              );
+      if (rootMode == 'upward') {
+        let parent = cwd;
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          try {
+            parent = dirname(parent);
+            // eslint-disable-next-line no-await-in-loop
+            await determine(joinPath(parent, 'node_modules'));
+            break;
+          } catch (e) {
+            if ((e as { code?: string }).code === 'ENOENT') {
+              if (dirname(parent).lastIndexOf(sep) <= 0) {
+                throw new Error(
+                  'failed to find node_modules directory in any parent dir in upward root mode'
+                );
+              } else {
+                continue;
+              }
             } else {
-              continue;
+              throw e;
             }
-          } else {
-            throw e;
           }
         }
+      } else if (!isRelativePath) {
+        throw new Error(
+          'invalid rootMode option. Valid options are: "local", "upward", and a path starting with "./"'
+        );
       }
     } else {
       await determine(joinPath(cwd, 'node_modules'));

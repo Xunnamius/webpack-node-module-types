@@ -4,7 +4,8 @@ import { asMockedFunction } from './setup';
 
 // TODO: use fixtures lib
 
-const polyrepoDir = `${__dirname}/fixtures/polyrepo-1`;
+const polyrepo1Dir = `${__dirname}/fixtures/polyrepo-1`;
+const polyrepo2Dir = `${__dirname}/fixtures/polyrepo-2`;
 const monorepo1Dir = `${__dirname}/fixtures/monorepo-1/packages/fake-pkg`;
 const monorepo2Dir = `${__dirname}/fixtures/monorepo-2/packages/fake-pkg`;
 
@@ -12,7 +13,7 @@ const pathActual = jest.requireActual('path');
 const joinPath = pathActual.join;
 
 const pathToBadNodeModules = joinPath(
-  polyrepoDir,
+  polyrepo1Dir,
   'node_modules',
   '@namespace',
   'dual-cjs-esm-4'
@@ -31,7 +32,7 @@ const mockedDirname = asMockedFunction(dirname);
 
 beforeEach(() => {
   clearCache();
-  process.chdir(polyrepoDir);
+  process.chdir(polyrepo1Dir);
   mockedJoin.mockImplementation(pathActual.join);
   mockedBasename.mockImplementation(pathActual.basename);
   mockedDirname.mockImplementation(pathActual.dirname);
@@ -232,6 +233,68 @@ describe('[ASYNC API] webpack-node-module-types', () => {
       determineModuleTypes({ rootMode: 'upward' })
     ).rejects.toMatchObject({
       message: 'right error'
+    });
+  });
+
+  it('upward root mode: accepts relative path to arbitrary node_modules #1', async () => {
+    expect.hasAssertions();
+    process.chdir(`${monorepo1Dir}/../..`);
+
+    const { cjs, esm } = await determineModuleTypes({
+      rootMode: './packages/fake-pkg/node_modules'
+    });
+
+    expect(cjs).toIncludeSameMembers([
+      'cjs-1',
+      'cjs-2',
+      'cjs-3',
+      'cjs-4',
+      'cjs-5',
+      '@namespace/dual-cjs-esm-5'
+    ]);
+
+    expect(esm).toIncludeSameMembers([
+      'esm-1',
+      'esm-2',
+      'esm-3',
+      'esm-4',
+      'esm-5',
+      'dual-cjs-esm-1',
+      'dual-cjs-esm-2',
+      'dual-cjs-esm-3',
+      'dual-cjs-esm-6',
+      '@namespace/dual-cjs-esm-4'
+    ]);
+  });
+
+  it('upward root mode: accepts relative path to arbitrary node_modules #2', async () => {
+    expect.hasAssertions();
+    process.chdir(polyrepo2Dir);
+
+    const { cjs, esm } = await determineModuleTypes({
+      rootMode: '../monorepo-2/node_modules'
+    });
+
+    expect(cjs).toIncludeSameMembers(['cjs-1', 'cjs-2', 'cjs-3', 'cjs-4']);
+
+    expect(esm).toIncludeSameMembers([
+      'esm-1',
+      'esm-2',
+      'esm-3',
+      'esm-4',
+      'dual-cjs-esm-1',
+      'dual-cjs-esm-2',
+      'dual-cjs-esm-3',
+      '@namespace/dual-cjs-esm-4',
+      '@namespace/dual-cjs-esm-5'
+    ]);
+  });
+
+  it('upward root mode: throws on invalid rootMode value', async () => {
+    expect.hasAssertions();
+
+    await expect(determineModuleTypes({ rootMode: 'bad' })).rejects.toMatchObject({
+      message: expect.stringContaining('invalid rootMode option')
     });
   });
 });
