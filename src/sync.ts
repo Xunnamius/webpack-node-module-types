@@ -120,7 +120,7 @@ export function determineModuleTypes(
         }
       } else if (!isRelativePath) {
         throw new Error(
-          'invalid rootMode option. Valid options are: "local", "upward", and a path starting with "./"'
+          'invalid rootMode option. Valid options are: "local", "upward", and a path starting with "./" or "../"'
         );
       }
     } else {
