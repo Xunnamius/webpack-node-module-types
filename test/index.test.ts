@@ -113,10 +113,10 @@ describe('[ASYNC API] webpack-node-module-types', () => {
     process.chdir(joinPath(pathToBadNodeModules, 'bad-4'));
 
     // ? Does not throw
-    await expect(determineModuleTypes()).resolves.toBeDefined();
+    await expect(determineModuleTypes()).toResolve();
   });
 
-  it('upward root mode: enables monorepo compatibility', async () => {
+  it('upward root mode: coalesces local and upward node_modules', async () => {
     expect.hasAssertions();
 
     process.chdir(monorepo1Dir);
@@ -145,7 +145,7 @@ describe('[ASYNC API] webpack-node-module-types', () => {
     ]);
   });
 
-  it('upward root mode: local node_modules overrides root node_modules in monorepo package dir', async () => {
+  it('upward root mode: local node_modules overrides root node_modules', async () => {
     expect.hasAssertions();
 
     process.chdir(monorepo1Dir);
@@ -156,7 +156,7 @@ describe('[ASYNC API] webpack-node-module-types', () => {
     expect(esm).not.toContain('@namespace/dual-cjs-esm-5');
   });
 
-  it('upward root mode: errors if no node_modules found #1', async () => {
+  it('upward root mode: errors if no upward node_modules found #1', async () => {
     expect.hasAssertions();
 
     mockedDirname.mockImplementationOnce(() => {
@@ -173,7 +173,7 @@ describe('[ASYNC API] webpack-node-module-types', () => {
     });
   });
 
-  it('upward root mode: errors if no node_modules found #2', async () => {
+  it('upward root mode: errors if upward no node_modules found #2', async () => {
     expect.hasAssertions();
 
     mockedDirname.mockImplementationOnce(() => {
@@ -187,19 +187,6 @@ describe('[ASYNC API] webpack-node-module-types', () => {
     process.chdir(monorepo1Dir);
     await expect(determineModuleTypes({ rootMode: 'upward' })).rejects.toMatchObject({
       message: expect.stringContaining('failed to find node_modules')
-    });
-  });
-
-  it('upward root mode: re-throws non-ENOENT errors', async () => {
-    expect.hasAssertions();
-
-    mockedDirname.mockImplementationOnce(() => {
-      throw new Error('badbadnotgood');
-    });
-
-    process.chdir(monorepo1Dir);
-    await expect(determineModuleTypes({ rootMode: 'upward' })).rejects.toMatchObject({
-      message: 'badbadnotgood'
     });
   });
 
@@ -217,7 +204,34 @@ describe('[ASYNC API] webpack-node-module-types', () => {
     expect(esm).toIncludeAllMembers(['esm-1', 'esm-2', 'esm-3', 'esm-4']);
   });
 
-  it('upward root mode: re-throws non-ENOENT errors when looking for local node_modules', async () => {
+  it('upward root mode: re-throws non-ENOENT errors when looking for upward node_modules', async () => {
+    expect.hasAssertions();
+
+    mockedDirname.mockImplementationOnce(() => {
+      throw new Error('badbadnotgood');
+    });
+
+    process.chdir(monorepo1Dir);
+    await expect(determineModuleTypes({ rootMode: 'upward' })).rejects.toMatchObject({
+      message: 'badbadnotgood'
+    });
+  });
+
+  it('upward root mode: re-throws deep non-ENOENT errors when looking for upward node_modules', async () => {
+    expect.hasAssertions();
+    process.chdir(monorepo2Dir);
+
+    mockedDirname.mockImplementationOnce(pathActual.dirname);
+    mockedDirname.mockImplementationOnce(() => {
+      throw new Error('right error');
+    });
+
+    await expect(determineModuleTypes({ rootMode: 'upward' })).rejects.toMatchObject({
+      message: 'right error'
+    });
+  });
+
+  it('upward root mode: re-throws non-ENOENT errors when looking for local node_modules (upward)', async () => {
     expect.hasAssertions();
     process.chdir(monorepo2Dir);
 
@@ -229,14 +243,12 @@ describe('[ASYNC API] webpack-node-module-types', () => {
       throw new Error('right error');
     });
 
-    await expect(() =>
-      determineModuleTypes({ rootMode: 'upward' })
-    ).rejects.toMatchObject({
+    await expect(determineModuleTypes({ rootMode: 'upward' })).rejects.toMatchObject({
       message: 'right error'
     });
   });
 
-  it('upward root mode: accepts relative path to arbitrary node_modules #1', async () => {
+  it('upward root mode: rootMode accepts path to relative node_modules with highest precedence', async () => {
     expect.hasAssertions();
     process.chdir(`${monorepo1Dir}/../..`);
 
@@ -267,27 +279,47 @@ describe('[ASYNC API] webpack-node-module-types', () => {
     ]);
   });
 
-  it('upward root mode: accepts relative path to arbitrary node_modules #2', async () => {
+  it('upward root mode: throws on non-existent local node_modules if rootMode given relative node_modules', async () => {
     expect.hasAssertions();
     process.chdir(polyrepo2Dir);
 
-    const { cjs, esm } = await determineModuleTypes({
-      rootMode: '../monorepo-2/node_modules'
+    await expect(
+      determineModuleTypes({
+        rootMode: '../monorepo-2/node_modules'
+      })
+    ).rejects.toMatchObject({
+      message: expect.stringContaining('failed to find local node_modules')
+    });
+  });
+
+  it('upward root mode: ignores ENOENT errors for non-existent relative node_modules', async () => {
+    expect.hasAssertions();
+    process.chdir(monorepo1Dir);
+
+    let cjs, esm;
+
+    await expect(
+      (async () =>
+        ({ cjs, esm } = await determineModuleTypes({ rootMode: './fake/path' })))()
+    ).toResolve();
+
+    expect(cjs).toIncludeAllMembers(['cjs-5', '@namespace/dual-cjs-esm-5']);
+    expect(esm).toIncludeAllMembers(['esm-5', 'dual-cjs-esm-6']);
+  });
+
+  it('upward root mode: re-throws non-ENOENT errors when looking for local node_modules (relative)', async () => {
+    expect.hasAssertions();
+    process.chdir(monorepo2Dir);
+
+    mockedJoin.mockImplementationOnce(() => {
+      throw new Error('right error');
     });
 
-    expect(cjs).toIncludeSameMembers(['cjs-1', 'cjs-2', 'cjs-3', 'cjs-4']);
-
-    expect(esm).toIncludeSameMembers([
-      'esm-1',
-      'esm-2',
-      'esm-3',
-      'esm-4',
-      'dual-cjs-esm-1',
-      'dual-cjs-esm-2',
-      'dual-cjs-esm-3',
-      '@namespace/dual-cjs-esm-4',
-      '@namespace/dual-cjs-esm-5'
-    ]);
+    await expect(determineModuleTypes({ rootMode: './fake/path' })).rejects.toMatchObject(
+      {
+        message: 'right error'
+      }
+    );
   });
 
   it('upward root mode: throws on invalid rootMode value', async () => {

@@ -4,7 +4,7 @@ import { asMockedFunction } from './setup';
 
 // TODO: use fixtures lib
 
-const polyrepoDir = `${__dirname}/fixtures/polyrepo-1`;
+const polyrepo1Dir = `${__dirname}/fixtures/polyrepo-1`;
 const polyrepo2Dir = `${__dirname}/fixtures/polyrepo-2`;
 const monorepo1Dir = `${__dirname}/fixtures/monorepo-1/packages/fake-pkg`;
 const monorepo2Dir = `${__dirname}/fixtures/monorepo-2/packages/fake-pkg`;
@@ -13,7 +13,7 @@ const pathActual = jest.requireActual('path');
 const joinPath = pathActual.join;
 
 const pathToBadNodeModules = joinPath(
-  polyrepoDir,
+  polyrepo1Dir,
   'node_modules',
   '@namespace',
   'dual-cjs-esm-4'
@@ -32,7 +32,7 @@ const mockedDirname = asMockedFunction(dirname);
 
 beforeEach(() => {
   clearCache();
-  process.chdir(polyrepoDir);
+  process.chdir(polyrepo1Dir);
   mockedJoin.mockImplementation(pathActual.join);
   mockedBasename.mockImplementation(pathActual.basename);
   mockedDirname.mockImplementation(pathActual.dirname);
@@ -116,7 +116,7 @@ describe('[SYNC API] webpack-node-module-types', () => {
     expect(() => determineModuleTypes()).not.toThrow();
   });
 
-  it('upward root mode: enables monorepo compatibility', () => {
+  it('upward root mode: coalesces local and upward node_modules', () => {
     expect.hasAssertions();
 
     process.chdir(monorepo1Dir);
@@ -145,7 +145,7 @@ describe('[SYNC API] webpack-node-module-types', () => {
     ]);
   });
 
-  it('upward root mode: local node_modules overrides root node_modules in monorepo package dir', () => {
+  it('upward root mode: local node_modules overrides root node_modules', () => {
     expect.hasAssertions();
 
     process.chdir(monorepo1Dir);
@@ -156,7 +156,7 @@ describe('[SYNC API] webpack-node-module-types', () => {
     expect(esm).not.toContain('@namespace/dual-cjs-esm-5');
   });
 
-  it('upward root mode: errors if no node_modules found #1', () => {
+  it('upward root mode: errors if no upward node_modules found #1', () => {
     expect.hasAssertions();
 
     mockedDirname.mockImplementationOnce(() => {
@@ -173,7 +173,7 @@ describe('[SYNC API] webpack-node-module-types', () => {
     );
   });
 
-  it('upward root mode: errors if no node_modules found #2', () => {
+  it('upward root mode: errors if upward no node_modules found #2', () => {
     expect.hasAssertions();
 
     mockedDirname.mockImplementationOnce(() => {
@@ -190,7 +190,17 @@ describe('[SYNC API] webpack-node-module-types', () => {
     );
   });
 
-  it('upward root mode: re-throws non-ENOENT errors', () => {
+  it('upward root mode: ignores ENOENT errors for non-existent local node_modules', () => {
+    expect.hasAssertions();
+    process.chdir(monorepo2Dir);
+
+    const { cjs, esm } = determineModuleTypes({ rootMode: 'upward' });
+
+    expect(cjs).toIncludeAllMembers(['cjs-1', 'cjs-2', 'cjs-3', 'cjs-4']);
+    expect(esm).toIncludeAllMembers(['esm-1', 'esm-2', 'esm-3', 'esm-4']);
+  });
+
+  it('upward root mode: re-throws non-ENOENT errors when looking for upward node_modules', () => {
     expect.hasAssertions();
 
     mockedDirname.mockImplementationOnce(() => {
@@ -201,21 +211,19 @@ describe('[SYNC API] webpack-node-module-types', () => {
     expect(() => determineModuleTypes({ rootMode: 'upward' })).toThrow(/badbadnotgood/);
   });
 
-  it('upward root mode: ignores ENOENT errors for non-existent local node_modules', () => {
+  it('upward root mode: re-throws deep non-ENOENT errors when looking for upward node_modules', () => {
     expect.hasAssertions();
     process.chdir(monorepo2Dir);
 
-    let cjs, esm;
+    mockedDirname.mockImplementationOnce(pathActual.dirname);
+    mockedDirname.mockImplementationOnce(() => {
+      throw new Error('right error');
+    });
 
-    expect(
-      () => ({ cjs, esm } = determineModuleTypes({ rootMode: 'upward' }))
-    ).not.toThrow();
-
-    expect(cjs).toIncludeAllMembers(['cjs-1', 'cjs-2', 'cjs-3', 'cjs-4']);
-    expect(esm).toIncludeAllMembers(['esm-1', 'esm-2', 'esm-3', 'esm-4']);
+    expect(() => determineModuleTypes({ rootMode: 'upward' })).toThrow(/right error/);
   });
 
-  it('upward root mode: re-throws non-ENOENT errors when looking for local node_modules', () => {
+  it('upward root mode: re-throws non-ENOENT errors when looking for local node_modules (upward)', () => {
     expect.hasAssertions();
     process.chdir(monorepo2Dir);
 
@@ -230,7 +238,7 @@ describe('[SYNC API] webpack-node-module-types', () => {
     expect(() => determineModuleTypes({ rootMode: 'upward' })).toThrow(/right error/);
   });
 
-  it('upward root mode: accepts relative path to arbitrary node_modules #1', () => {
+  it('upward root mode: rootMode accepts path to relative node_modules with highest precedence', () => {
     expect.hasAssertions();
     process.chdir(`${monorepo1Dir}/../..`);
 
@@ -261,27 +269,36 @@ describe('[SYNC API] webpack-node-module-types', () => {
     ]);
   });
 
-  it('upward root mode: accepts relative path to arbitrary node_modules #2', () => {
+  it('upward root mode: throws on non-existent local node_modules if rootMode given relative node_modules', () => {
     expect.hasAssertions();
     process.chdir(polyrepo2Dir);
 
-    const { cjs, esm } = determineModuleTypes({
-      rootMode: '../monorepo-2/node_modules'
+    expect(() =>
+      determineModuleTypes({
+        rootMode: '../monorepo-2/node_modules'
+      })
+    ).toThrow(/failed to find local node_modules/);
+  });
+
+  it('upward root mode: ignores ENOENT errors for non-existent relative node_modules', () => {
+    expect.hasAssertions();
+    process.chdir(monorepo1Dir);
+
+    const { cjs, esm } = determineModuleTypes({ rootMode: './fake/path' });
+
+    expect(cjs).toIncludeAllMembers(['cjs-5', '@namespace/dual-cjs-esm-5']);
+    expect(esm).toIncludeAllMembers(['esm-5', 'dual-cjs-esm-6']);
+  });
+
+  it('upward root mode: re-throws non-ENOENT errors when looking for local node_modules (relative)', () => {
+    expect.hasAssertions();
+    process.chdir(monorepo2Dir);
+
+    mockedJoin.mockImplementationOnce(() => {
+      throw new Error('left error');
     });
 
-    expect(cjs).toIncludeSameMembers(['cjs-1', 'cjs-2', 'cjs-3', 'cjs-4']);
-
-    expect(esm).toIncludeSameMembers([
-      'esm-1',
-      'esm-2',
-      'esm-3',
-      'esm-4',
-      'dual-cjs-esm-1',
-      'dual-cjs-esm-2',
-      'dual-cjs-esm-3',
-      '@namespace/dual-cjs-esm-4',
-      '@namespace/dual-cjs-esm-5'
-    ]);
+    expect(() => determineModuleTypes({ rootMode: './fake/path' })).toThrow(/left error/);
   });
 
   it('upward root mode: throws on invalid rootMode value', () => {

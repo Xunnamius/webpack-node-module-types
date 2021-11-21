@@ -111,8 +111,8 @@ Example:
 const { determineModuleTypes } = require('webpack-node-module-types/sync');
 console.log(determineModuleTypes({ rootMode: "upward" }));
 // Will find:
-//   - /repos/my-workspace/packages/pkg-1/node_modules (highest precedence, optional)
-//   - /repos/my-workspace/node_modules
+//   - /repos/my-workspace/packages/pkg-1/node_modules (local node_modules, highest precedence, optional)
+//   - /repos/my-workspace/node_modules ("upward" node_modules, must exist)
 ```
 
 > `rootMode` is set to "local" by default.
@@ -120,8 +120,9 @@ console.log(determineModuleTypes({ rootMode: "upward" }));
 In addition to `"upward"` and `"local"`, `rootMode` also accepts an explicit
 `node_modules` path (beginning with `./` or `../`) relative to the current
 working directory. When used in this way, packages found under the relative
-`node_modules` directory take precedence over those found in any local
-`node_modules` directory, if it exists.
+`node_modules` directory, if it exists, take precedence over those found in any
+local `node_modules` directory. If no local `node_modules` directory is found,
+an error is thrown.
 
 Example:
 
@@ -130,8 +131,8 @@ Example:
 const { determineModuleTypes } = require('webpack-node-module-types/sync');
 console.log(determineModuleTypes({ rootMode: "./packages/pkg-1/node_modules" }));
 // Will find:
-//   - /repos/my-workspace/node_modules (optional)
-//   - /repos/my-workspace/packages/pkg-1/node_modules (highest precedence)
+//   - /repos/my-workspace/node_modules (local node_modules, must exist)
+//   - /repos/my-workspace/packages/pkg-1/node_modules (relative node_modules, highest precedence, optional)
 ```
 
 ## Documentation

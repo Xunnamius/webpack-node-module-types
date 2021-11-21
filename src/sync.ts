@@ -71,9 +71,9 @@ const determine = (dir: string, scoped = false) => {
  * Accepts a `rootMode` parameter of either `"local"`, `"upward"`, or a path to
  * node_modules relative to the current working directory (starting with `"./"`
  * or `"../"`). Defaults to `"local"`. If `"upward"` is used, package types in
- * the local node_modules directory, if it exists, override those in any upward
+ * the local node_modules directory, if it exists, override those in the upward
  * node_modules directory. On the other hand, if a relative path is given, its
- * contents override those in any local node_modules directory if it exists.
+ * contents, if it exists, override those in the local node_modules directory.
  */
 export function determineModuleTypes(
   { rootMode }: { rootMode: string } = { rootMode: 'local' }
@@ -85,18 +85,31 @@ export function determineModuleTypes(
       const isRelativePath = rootMode.startsWith('./') || rootMode.startsWith('../');
 
       if (isRelativePath) {
-        determine(joinPath(cwd, rootMode));
-      }
-
-      try {
-        determine(joinPath(cwd, 'node_modules'));
-      } catch (e) {
-        if ((e as { code?: string }).code !== 'ENOENT') {
-          throw e;
+        try {
+          determine(joinPath(cwd, rootMode));
+        } catch (e) {
+          if ((e as { code?: string }).code !== 'ENOENT') {
+            throw e;
+          }
         }
-      }
 
-      if (rootMode == 'upward') {
+        const path = joinPath(cwd, 'node_modules');
+        try {
+          determine(path);
+        } catch (e) {
+          throw new Error(
+            `failed to find local node_modules directory at "${path}": ${e}`
+          );
+        }
+      } else if (rootMode == 'upward') {
+        try {
+          determine(joinPath(cwd, 'node_modules'));
+        } catch (e) {
+          if ((e as { code?: string }).code !== 'ENOENT') {
+            throw e;
+          }
+        }
+
         let parent = cwd;
         // eslint-disable-next-line no-constant-condition
         while (true) {
@@ -118,7 +131,7 @@ export function determineModuleTypes(
             }
           }
         }
-      } else if (!isRelativePath) {
+      } else {
         throw new Error(
           'invalid rootMode option. Valid options are: "local", "upward", and a path starting with "./" or "../"'
         );
