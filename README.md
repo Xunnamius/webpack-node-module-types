@@ -1,5 +1,5 @@
 [![Black Lives Matter!](https://api.ergodark.com/badges/blm 'Join the movement!')](https://secure.actblue.com/donate/ms_blm_homepage_2019)
-[![Maintenance status](https://img.shields.io/maintenance/active/2021 'Is this package maintained?')](https://www.npmjs.com/package/webpack-node-module-types)
+[![Maintenance status](https://img.shields.io/maintenance/active/2022 'Is this package maintained?')](https://www.npmjs.com/package/webpack-node-module-types)
 [![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/webpack-node-module-types 'When was the last commit to the official repo?')](https://www.npmjs.com/package/webpack-node-module-types)
 [![Open issues](https://img.shields.io/github/issues/xunnamius/webpack-node-module-types 'Number of known issues with this package')](https://www.npmjs.com/package/webpack-node-module-types)
 [![Pull requests](https://img.shields.io/github/issues-pr/xunnamius/webpack-node-module-types 'Number of open pull requests')](https://www.npmjs.com/package/webpack-node-module-types)
