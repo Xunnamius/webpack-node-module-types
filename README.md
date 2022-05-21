@@ -1,4 +1,4 @@
-[![Black Lives Matter!](https://api.ergodark.com/badges/blm 'Join the movement!')](https://secure.actblue.com/donate/ms_blm_homepage_2019)
+[![Black Lives Matter!](https://xunn.at/badge-blm 'Join the movement!')](https://xunn.at/donate-blm)
 [![Maintenance status](https://img.shields.io/maintenance/active/2022 'Is this package maintained?')](https://www.npmjs.com/package/webpack-node-module-types)
 [![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/webpack-node-module-types 'When was the last commit to the official repo?')](https://www.npmjs.com/package/webpack-node-module-types)
 [![Open issues](https://img.shields.io/github/issues/xunnamius/webpack-node-module-types 'Number of known issues with this package')](https://www.npmjs.com/package/webpack-node-module-types)
@@ -107,7 +107,7 @@ precedence over those found in a higher-level `node_modules` directory.
 Example:
 
 ```TypeScript
-// process.cwd() => /repos/my-workspace/pkg-1
+// process.cwd() => /repos/my-workspace/packages/pkg-1
 const { determineModuleTypes } = require('webpack-node-module-types/sync');
 console.log(determineModuleTypes({ rootMode: "upward" }));
 // Will find:
