@@ -1,5 +1,5 @@
 [![Black Lives Matter!](https://xunn.at/badge-blm 'Join the movement!')](https://xunn.at/donate-blm)
-[![Maintenance status](https://img.shields.io/maintenance/active/2022 'Is this package maintained?')](https://www.npmjs.com/package/webpack-node-module-types)
+[![Maintenance status](https://img.shields.io/maintenance/active/2023 'Is this package maintained?')](https://www.npmjs.com/package/webpack-node-module-types)
 [![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/webpack-node-module-types 'When was the last commit to the official repo?')](https://www.npmjs.com/package/webpack-node-module-types)
 [![Open issues](https://img.shields.io/github/issues/xunnamius/webpack-node-module-types 'Number of known issues with this package')](https://www.npmjs.com/package/webpack-node-module-types)
 [![Pull requests](https://img.shields.io/github/issues-pr/xunnamius/webpack-node-module-types 'Number of open pull requests')](https://www.npmjs.com/package/webpack-node-module-types)
@@ -44,7 +44,7 @@ npm install --save-dev webpack-node-module-types
 In addition to the bare import, this module exports two deep exports: `/sync`
 and `/async`. Both CJS `require()` and ESM-style `import` syntax are supported.
 
-```TypeScript
+```typescript
 // Returns the asynchronous promise-based API (faster, better)
 import { determineModuleTypes } from 'webpack-node-module-types';
 
@@ -58,7 +58,7 @@ import { determineModuleTypes } from 'webpack-node-module-types/async';
 Here's an example from [Node's REPL](https://nodejs.org/api/repl.html#repl_repl)
 listing this package's own CJS and ESM dependencies:
 
-```JavaScript
+```javascript
 > const { determineModuleTypes } = require('webpack-node-module-types/sync')
 undefined
 > console.log(determineModuleTypes())
@@ -106,7 +106,7 @@ precedence over those found in a higher-level `node_modules` directory.
 
 Example:
 
-```TypeScript
+```typescript
 // process.cwd() => /repos/my-workspace/packages/pkg-1
 const { determineModuleTypes } = require('webpack-node-module-types/sync');
 console.log(determineModuleTypes({ rootMode: "upward" }));
@@ -126,7 +126,7 @@ an error is thrown.
 
 Example:
 
-```TypeScript
+```typescript
 // process.cwd() => /repos/my-workspace
 const { determineModuleTypes } = require('webpack-node-module-types/sync');
 console.log(determineModuleTypes({ rootMode: "./packages/pkg-1/node_modules" }));
