@@ -1,8 +1,11 @@
 {
   "name": "webpack-node-module-types",
-  "version": "1.2.3",
-  "description": "Attempts to classify each dependency under node_modules as a CJS or ESM package",
+  "version": "1.2.4",
+  "description": "⛔️ [DEPRECATED] Attempts to classify each dependency under node_modules as a CJS or ESM package",
   "keywords": [
+    "deprecated",
+    "obsolete",
+    "archived",
     "node",
     "webpack",
     "module",

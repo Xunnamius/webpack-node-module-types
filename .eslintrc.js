@@ -37,6 +37,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/prefer-ts-expect-error': 'warn',
+    '@typescript-eslint/no-misused-promises': ['error'],
     '@typescript-eslint/no-floating-promises': [
       'error',
       { ignoreVoid: true, ignoreIIFE: true }

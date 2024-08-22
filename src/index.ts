@@ -29,13 +29,13 @@ const isCjs = async (path: string) => {
 
     const isMjsExtensionInExportObject = (e: Export): boolean => {
       if (!e) return false;
-      if (typeof e == 'string') return e.endsWith('.mjs');
+      if (typeof e === 'string') return e.endsWith('.mjs');
       return Object.values(e).some((k) => isMjsExtensionInExportObject(k));
     };
 
     return !(
       'module' in pkg ||
-      pkg.type == 'module' ||
+      pkg.type === 'module' ||
       pkg.main?.endsWith('.mjs') ||
       isMjsExtensionInExportObject(pkg.exports)
     );
@@ -108,7 +108,7 @@ export async function determineModuleTypes(
             `failed to find local node_modules directory at "${path}": ${e}`
           );
         }
-      } else if (rootMode == 'upward') {
+      } else if (rootMode === 'upward') {
         try {
           await determine(joinPath(cwd, 'node_modules'));
         } catch (e) {
