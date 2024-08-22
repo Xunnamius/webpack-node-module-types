@@ -1,12 +1,17 @@
-[![Black Lives Matter!](https://xunn.at/badge-blm 'Join the movement!')](https://xunn.at/donate-blm)
-[![Maintenance status](https://img.shields.io/maintenance/active/2023 'Is this package maintained?')](https://www.npmjs.com/package/webpack-node-module-types)
-[![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/webpack-node-module-types 'When was the last commit to the official repo?')](https://www.npmjs.com/package/webpack-node-module-types)
-[![Open issues](https://img.shields.io/github/issues/xunnamius/webpack-node-module-types 'Number of known issues with this package')](https://www.npmjs.com/package/webpack-node-module-types)
-[![Pull requests](https://img.shields.io/github/issues-pr/xunnamius/webpack-node-module-types 'Number of open pull requests')](https://www.npmjs.com/package/webpack-node-module-types)
-[![Source license](https://img.shields.io/npm/l/webpack-node-module-types "This package's source license")](https://www.npmjs.com/package/webpack-node-module-types)
-[![NPM version](https://api.ergodark.com/badges/npm-pkg-version/webpack-node-module-types 'Install this package using npm or yarn!')](https://www.npmjs.com/package/webpack-node-module-types)
+<!-- badges-start -->
 
-# webpack-node-module-types
+[![Black Lives Matter!][badge-blm]][link-blm]
+[![!!UNMAINTAINED!!][badge-unmaintained]][link-unmaintained]
+
+<!-- badges-end -->
+
+# ⛔️ DEPRECATED/UNMAINTAINED
+
+> [!CAUTION]
+>
+> This project served its purpose back in the day. JavaScript and Webpack have
+> evolved mightily over the last decade, and as a result this project does not
+> make much sense anymore.
 
 This package attempts to determine the module type (ESM/`.mjs` vs
 CJS/`.cjs`/`.js`) of each top-level package in `node_modules/`, including scoped
@@ -109,7 +114,7 @@ Example:
 ```typescript
 // process.cwd() => /repos/my-workspace/packages/pkg-1
 const { determineModuleTypes } = require('webpack-node-module-types/sync');
-console.log(determineModuleTypes({ rootMode: "upward" }));
+console.log(determineModuleTypes({ rootMode: 'upward' }));
 // Will find:
 //   - /repos/my-workspace/packages/pkg-1/node_modules (local node_modules, highest precedence, optional)
 //   - /repos/my-workspace/node_modules ("upward" node_modules, must exist)
@@ -129,7 +134,9 @@ Example:
 ```typescript
 // process.cwd() => /repos/my-workspace
 const { determineModuleTypes } = require('webpack-node-module-types/sync');
-console.log(determineModuleTypes({ rootMode: "./packages/pkg-1/node_modules" }));
+console.log(
+  determineModuleTypes({ rootMode: './packages/pkg-1/node_modules' })
+);
 // Will find:
 //   - /repos/my-workspace/node_modules (local node_modules, must exist)
 //   - /repos/my-workspace/packages/pkg-1/node_modules (relative node_modules, highest precedence, optional)
@@ -154,6 +161,12 @@ you submit a pull request, take care to maintain the existing coding style and
 add unit tests for any new or changed functionality. Please lint and test your
 code, of course!
 
+[badge-blm]: https://xunn.at/badge-blm 'Join the movement!'
+[link-blm]: https://xunn.at/donate-blm
+[badge-unmaintained]:
+  https://xunn.at/badge-unmaintained
+  'Unfortunately, this project is unmaintained (forks welcome!)'
+[link-unmaintained]: https://xunn.at/link-unmaintained
 [side-effects-key]:
   https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free
 [exports-main-key]:
